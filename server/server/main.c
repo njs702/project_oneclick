@@ -78,5 +78,8 @@ int main() {
 	else {
 		printf("Connection accepted!\n");
 	}
+	closesocket(clientSocket);
+	closesocket(serverSocket);
+	WSACleanup();
 
 }
