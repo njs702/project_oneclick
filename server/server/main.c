@@ -1,6 +1,7 @@
 #pragma comment(lib,"ws2_32.lib")  // winsock2를 사용하기 위한 lib를 추가합니다.
 #include <stdio.h>
 #include <WinSock2.h>
+#define DEFAULT_PORT "27015"
 
 // 윈도우 소켓의 가장 기본적인 흐름
 // Winsock 초기화 -> socket 생성 -> network 통신 -> socket 닫기 -> Winsock 종료
@@ -10,6 +11,7 @@ int main() {
 	//WSADATA 구조체에는 Windows 소켓 구현에 대한 정보가 포함되어 있음
 	WSADATA wsaData;
 	SOCKET serverSocket;
+	struct sockaddr_in server;
 
 	// 1. Winsock 초기화, WINSOCK VERSION 2.2
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
@@ -27,5 +29,23 @@ int main() {
 	}
 	else {
 		printf("Socket has been created!\n");
+		// Address Family : AF_INET ( = IPv4)
+		// Type : SOCK_STREAM( = TCP Protocol connection)
+		// Protocol : 0
 	}
+
+	server.sin_addr.s_addr = INADDR_ANY; // 자동으로 이 컴퓨터에 존재하는 랜카드 중 사용가능한 랜카드의 IP주소 사용
+	server.sin_family = AF_INET; // IPv4
+	server.sin_port = htons(9090); // 사용할 포트 번호 지정
+
+	// 3. Socket 생성 후 Bind
+	if (bind(serverSocket, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR) {
+		printf("Bind failed with error code : %d\n", WSAGetLastError());
+	}
+	else {
+		printf("Bind done!\n");
+	}
+	
+
+
 }
