@@ -11,6 +11,7 @@ int main() {
 	//WSADATA 구조체에는 Windows 소켓 구현에 대한 정보가 포함되어 있음
 	WSADATA wsaData;
 	SOCKET serverSocket;
+	SOCKET clientSocket; // 클라이언트의 연결을 수락하기 위한 임시 SOCKET
 	struct sockaddr_in server;
 
 	// 1. Winsock 초기화, WINSOCK VERSION 2.2
@@ -50,10 +51,7 @@ int main() {
 	}
 	
 	// 4. Socket에서 Listen을 통해 수신 대기
-	/*Sleep(2000);
-	listen(serverSocket, SOMAXCONN);
-	printf("Waiting for incoming connections...\n");*/
-
+	
 	if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR) {
 		printf("Listen failed with error: %ld\n", WSAGetLastError());
 		closesocket(serverSocket);
@@ -64,6 +62,25 @@ int main() {
 		Sleep(2000);
 		printf("Waiting for incoming connections...\n");
 	}
+
+	/*Sleep(2000);
+	listen(serverSocket, SOMAXCONN);
+	printf("Waiting for incoming connections...\n");*/
+
+
+	// 5. Client의 연결 요청을 수락하기
+	clientSocket = INVALID_SOCKET;
+	clientSocket = accept(serverSocket,NULL,NULL);
+	if (clientSocket == INVALID_SOCKET) {
+		printf("accept failed: %d\n", WSAGetLastError());
+		closesocket(serverSocket);
+		WSACleanup();
+		return 1;
+	}
+	else {
+		printf("Connection accepted!\n");
+	}
+
 
 
 }
