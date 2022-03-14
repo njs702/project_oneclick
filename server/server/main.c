@@ -19,6 +19,7 @@ int main() {
 		return 1;
 	}
 	else {
+		Sleep(2000);
 		printf("WSAStartup completed!!\n");
 	}
 
@@ -28,6 +29,7 @@ int main() {
 		printf("Could not create socket : %d\n", WSAGetLastError());
 	}
 	else {
+		Sleep(2000);
 		printf("Socket has been created!\n");
 		// Address Family : AF_INET ( = IPv4)
 		// Type : SOCK_STREAM( = TCP Protocol connection)
@@ -43,9 +45,25 @@ int main() {
 		printf("Bind failed with error code : %d\n", WSAGetLastError());
 	}
 	else {
+		Sleep(2000);
 		printf("Bind done!\n");
 	}
 	
+	// 4. Socket에서 Listen을 통해 수신 대기
+	/*Sleep(2000);
+	listen(serverSocket, SOMAXCONN);
+	printf("Waiting for incoming connections...\n");*/
+
+	if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR) {
+		printf("Listen failed with error: %ld\n", WSAGetLastError());
+		closesocket(serverSocket);
+		WSACleanup();
+		return 1;
+	}
+	else {
+		Sleep(2000);
+		printf("Waiting for incoming connections...\n");
+	}
 
 
 }
