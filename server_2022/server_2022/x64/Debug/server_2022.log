@@ -1,7 +1,5 @@
-<<<<<<< HEAD
-﻿  LINK : C:\Users\Junseok\oneclick\server_2022\x64\Debug\server_2022.exe을(를) 찾을 수 없거나 마지막 증분 링크에 의해 빌드되지 않았습니다. 전체 링크를 수행하고 있습니다.
-=======
 ﻿  main.c
-C:\Users\Junseok\oneclick\server_2022\server_2022\main.c(17,8): warning C4101: 'message' :참조되지 않은 지역 변수입니다.
->>>>>>> d7f95d809bdbc0ae3477fa2d3cba981bddebe28f
+C:\Users\Junseok\oneclick\server_2022\server_2022\main.c(6,1): warning C4005: '_WINSOCK_DEPRECATED_NO_WARNINGS': 매크로 재정의
+C:\Users\Junseok\oneclick\server_2022\server_2022\main.c : message : '_WINSOCK_DEPRECATED_NO_WARNINGS'의 이전 정의를 참조하십시오.
+C:\Users\Junseok\oneclick\server_2022\server_2022\main.c(18,8): warning C4101: 'message' :참조되지 않은 지역 변수입니다.
   server_2022.vcxproj -> C:\Users\Junseok\oneclick\server_2022\x64\Debug\server_2022.exe

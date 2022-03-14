@@ -3,6 +3,7 @@
 #include <WinSock2.h>
 #include <string.h>
 #define DEFAULT_PORT "27015"
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 // 윈도우 소켓의 가장 기본적인 흐름
 // Winsock 초기화 -> socket 생성 -> network 통신 -> socket 닫기 -> Winsock 종료
@@ -40,7 +41,8 @@ int main() {
 		// Protocol : 0
 	}
 
-	server.sin_addr.s_addr = INADDR_ANY; // 자동으로 이 컴퓨터에 존재하는 랜카드 중 사용가능한 랜카드의 IP주소 사용
+	//server.sin_addr.s_addr = INADDR_ANY; // 자동으로 이 컴퓨터에 존재하는 랜카드 중 사용가능한 랜카드의 IP주소 사용
+	server.sin_addr.s_addr = inet_addr("211.215.249.35");
 	server.sin_family = AF_INET; // IPv4
 	server.sin_port = htons(9090); // 사용할 포트 번호 지정
 
