@@ -1,6 +1,7 @@
 #pragma comment(lib,"ws2_32.lib")  // winsock2를 사용하기 위한 lib를 추가합니다.
 #include <stdio.h>
 #include <WinSock2.h>
+#include <string.h>
 #define DEFAULT_PORT "27015"
 
 // 윈도우 소켓의 가장 기본적인 흐름
@@ -13,6 +14,8 @@ int main() {
 	SOCKET serverSocket;
 	SOCKET clientSocket;
 	struct sockaddr_in server;
+	char *message;
+	int c;
 
 	// 1. Winsock 초기화, WINSOCK VERSION 2.2
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
@@ -67,6 +70,7 @@ int main() {
 	}
 
 	// 5. Client의 연결 요청을 수락하기
+	c = sizeof(struct sockaddr_in);
 	clientSocket = INVALID_SOCKET;
 	clientSocket = accept(serverSocket, NULL, NULL);
 	if (clientSocket == INVALID_SOCKET) {
@@ -80,12 +84,12 @@ int main() {
 	}
 
 
-	// ========= 메시지 주고받기 ========= //
+	// 6. Client와 Server 간에 메시지 주고 받기
+	
 
 
-
-	closesocket(clientSocket);
+	/*closesocket(clientSocket);
 	closesocket(serverSocket);
-	WSACleanup();
+	WSACleanup();*/
 
 }
