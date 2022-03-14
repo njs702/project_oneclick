@@ -27,5 +27,8 @@ int main() {
 	}
 	else {
 		printf("Socket has been created!\n");
+		// Address Family : AF_INET ( = IPv4)
+		// Type : SOCK_STREAM( = TCP Protocol connection)
+		// Protocol : 0
 	}
 }
