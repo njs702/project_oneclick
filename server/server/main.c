@@ -9,6 +9,7 @@ int main() {
 
 	//WSADATA 구조체에는 Windows 소켓 구현에 대한 정보가 포함되어 있음
 	WSADATA wsaData;
+	SOCKET serverSocket;
 
 	// 1. Winsock 초기화, WINSOCK VERSION 2.2
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
@@ -20,5 +21,11 @@ int main() {
 	}
 
 	// 2. 초기화 후 서버에서 사용할 SOCKET 인스턴스 생성
-
+	// socket() function is used to create a socket
+	if ((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+		printf("Could not create socket : %d\n", WSAGetLastError());
+	}
+	else {
+		printf("Socket has been created!\n");
+	}
 }
