@@ -1,5 +1,6 @@
 ﻿  main.c
 C:\Users\Junseok\oneclick\server_2022\server_2022\main.c(6,1): warning C4005: '_WINSOCK_DEPRECATED_NO_WARNINGS': 매크로 재정의
 C:\Users\Junseok\oneclick\server_2022\server_2022\main.c : message : '_WINSOCK_DEPRECATED_NO_WARNINGS'의 이전 정의를 참조하십시오.
-C:\Users\Junseok\oneclick\server_2022\server_2022\main.c(18,8): warning C4101: 'message' :참조되지 않은 지역 변수입니다.
+C:\Users\Junseok\oneclick\server_2022\server_2022\main.c(92,36): warning C4267: '함수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Junseok\oneclick\server_2022\server_2022\main.c(18,21): warning C4101: 'client' :참조되지 않은 지역 변수입니다.
   server_2022.vcxproj -> C:\Users\Junseok\oneclick\server_2022\x64\Debug\server_2022.exe

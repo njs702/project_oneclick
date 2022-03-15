@@ -13,7 +13,7 @@ int main() {
     WSADATA wsaData;
     SOCKET clientSocket;
     struct sockaddr_in server;
-    char* server_reply[2000];
+    char server_reply[2000];
     int recv_size;
     char* message;
 
@@ -73,6 +73,11 @@ int main() {
     }
     else {
         printf("Reply received!\n");
+        server_reply[recv_size] = '\0';
+        puts(server_reply);
     }
-    //server_reply[recv_size] = NULL;
+    
+
+    closesocket(clientSocket);
+    WSACleanup();
 }

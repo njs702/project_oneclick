@@ -15,6 +15,7 @@ int main() {
 	SOCKET serverSocket;
 	SOCKET clientSocket;
 	struct sockaddr_in server;
+	struct sockaddr_in client;
 	char *message;
 	int c;
 
@@ -86,12 +87,15 @@ int main() {
 	}
 
 
-	// 6. Client와 Server 간에 메시지 주고 받기
-	
+	// 6. Reply to Client
+	message = "Hello Client!!!\n";
+	send(clientSocket, message, strlen(message), 0);
+
+	getchar();
 
 
-	/*closesocket(clientSocket);
+	closesocket(clientSocket);
 	closesocket(serverSocket);
-	WSACleanup();*/
+	WSACleanup();
 
 }
