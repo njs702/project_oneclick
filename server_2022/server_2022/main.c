@@ -62,7 +62,7 @@ int main() {
 	//server.sin_addr.s_addr = INADDR_ANY; // 자동으로 이 컴퓨터에 존재하는 랜카드 중 사용가능한 랜카드의 IP주소 사용
 	server.sin_addr.s_addr = inet_addr("211.215.249.35");
 	server.sin_family = AF_INET; // IPv4
-	server.sin_port = htons(80); // 사용할 포트 번호 지정
+	server.sin_port = htons(9090); // 사용할 포트 번호 지정
 
 	// 3. Socket 생성 후 Bind
 	if (bind(serverSocket, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR) {
@@ -120,14 +120,64 @@ int main() {
 				exit(EXIT_FAILURE);
 			}
 			printf("New connection, socket fd is %d, ip is : %s, port : %d\n", newSocket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
-		}
 
-		// 6. 연결 요청이 들어온 client에 welcome message send하기
-		message = "Welcom client!!";
-		if (send(newSocket, message, strlen(message), 0) != strlen(message)) {
-			perror("send failed");
+
+			// 6. 연결 요청이 들어온 client에 welcome message send하기
+			message = "Welcom client!!";
+			if (send(newSocket, message, strlen(message), 0) != strlen(message)) {
+				perror("send failed");
+			}
+			printf("Welcom message sent successfully to %s\n", inet_ntoa(address.sin_addr));
+
+			// add new socket to array of sockets
+			for (int i = 0; i < max_clients; i++) {
+				if (client_socket[i] == 0) {
+					client_socket[i] = newSocket;
+					printf("Adding to list of sockets at index %d\n", i);
+					break;
+				}
+			}
 		}
-		printf("Welcom message sent successfully to %s\n", inet_ntoa(address.sin_addr));
+		// 다른 socket에 의한 IO OPERATION
+		else {
+			for (int i = 0; i < max_clients; i++) {
+				s = client_socket[i];
+				// if client presend in read socket
+				if (FD_ISSET(s, &readfds)) {
+					// get details of the client
+					getpeername(s, (struct sockaddr* )&address, (int*)&addrlen);
+
+					// 7. client로부터 오는 데이터 읽어들이기
+					valread = recv(s, buffer, MAXRECV, 0);
+					if (valread == SOCKET_ERROR) {
+						int error_code = WSAGetLastError();
+						if (error_code == WSAECONNRESET) {
+							// 어떤 client가 연결이 비정상적으로 끊김, 정보를 표시한다
+							printf("Host disconnected unexpectedly, ip : %s, port %d\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+
+							// 해당 소켓 close 후 0으로 표시(재사용을 위해)
+							closesocket(s);
+							client_socket[i] = 0;
+						}
+					}
+					if (valread == 0) {
+						// client가 정상적으로 연결 끊음, 정보 표시
+						printf("Host disconnected unexpectedly, ip : %s, port %d\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+
+						// 해당 소켓 close 후 0으로 표시(재사용을 위해)
+						closesocket(s);
+						client_socket[i] = 0;
+					}
+					// Echo back the message that came in
+					else {
+						// add null character, 문자열을 다루기 위한 작업
+						buffer[valread] = '\0';
+						printf("%s:%d - %s\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), buffer);
+						send(s, buffer, valread, 0);
+					}
+				}
+			}
+		}
 	}
 
 	/*c = sizeof(struct sockaddr_in);
