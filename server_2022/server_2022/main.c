@@ -1,10 +1,12 @@
 #pragma comment(lib,"ws2_32.lib")  // winsock2를 사용하기 위한 lib를 추가합니다.
 #include <stdio.h>
+#include <stdlib.h>
 #include <WinSock2.h>
 #include <string.h>
 #include <io.h>
 #define DEFAULT_PORT "27015"
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 
 // 윈도우 소켓의 가장 기본적인 흐름
 // Winsock 초기화 -> socket 생성 -> network 통신 -> socket 닫기 -> Winsock 종료
@@ -14,10 +16,10 @@ int main() {
 	//WSADATA 구조체에는 Windows 소켓 구현에 대한 정보가 포함되어 있음
 	WSADATA wsaData;
 	SOCKET serverSocket;
-	SOCKET clientSocket;
+	SOCKET newSocket;
 	struct sockaddr_in server;
 	struct sockaddr_in client;
-	char *message;
+	char *message = NULL;
 	int c;
 
 	// 1. Winsock 초기화, WINSOCK VERSION 2.2
@@ -75,15 +77,26 @@ int main() {
 
 	// 5. Client의 연결 요청을 accept하기
 	c = sizeof(struct sockaddr_in);
-	clientSocket = INVALID_SOCKET;
+	newSocket = INVALID_SOCKET;
 	
-	while ((clientSocket = accept(serverSocket, NULL, NULL))!=INVALID_SOCKET) {
+	while ((newSocket = accept(serverSocket, NULL, NULL))!=INVALID_SOCKET) {
 		printf("Connection accepted!\n");
+		char* recv_buf = malloc(sizeof(char)*100);
+		//message = malloc(sizeof(char) * 1000);
+		int recv_size;
+		// 5.1 Client로부터 온 Data Read
+		recv_size = recv(newSocket, recv_buf, strlen(recv_buf), 0);
+		recv_buf[recv_size] = '\0';
+		printf("Message from Client : %s\n", recv_buf);
+
 		// 6. Reply to Client
-		message = "Hello Client!!!\n";
-		send(clientSocket, message, strlen(message), 0);
+		//strcpy(message, recv_buf);
+		message = "Hello client! ";
+		send(newSocket, message, strlen(message), 0);
+		free(recv_buf);
+		//free(message);
 	}
-	if (clientSocket == INVALID_SOCKET) {
+	if (newSocket == INVALID_SOCKET) {
 		printf("accept failed: %d\n", WSAGetLastError());
 		closesocket(serverSocket);
 		WSACleanup();
@@ -91,7 +104,7 @@ int main() {
 	}
 
 
-	closesocket(clientSocket);
+	closesocket(newSocket);
 	closesocket(serverSocket);
 	WSACleanup();
 

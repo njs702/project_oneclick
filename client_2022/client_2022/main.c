@@ -1,7 +1,9 @@
 #pragma comment(lib,"ws2_32.lib")  // winsock2를 사용하기 위한 lib를 추가합니다.
 #include <stdio.h>
+#include <stdlib.h>
 #include <WinSock2.h>
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #define DEFAULT_PORT "27015"
 #define MY_LOCAL_IP "211.215.249.35"
 
@@ -58,13 +60,21 @@ int main() {
     }
 
     // 4. Send data
-    message = "Hi I'm client!!!\n";
+    
+    message = malloc(sizeof(char) * 100);
+    printf("Enter your message : ");
+    gets(message);
+    if (message == NULL) {
+        message = "Hi I'M client!!!";
+    }
+
     if (send(clientSocket, message, strlen(message), 0) < 0) {
         printf("Send failed!\n");
         return 1;
     }
     else {
         printf("Message send : %s\n", message);
+        free(message);
     }
 
     // 5. Receive reply from server
@@ -77,7 +87,9 @@ int main() {
         puts(server_reply);
     }
     
-
+    
+    
+    
     closesocket(clientSocket);
     WSACleanup();
 }
