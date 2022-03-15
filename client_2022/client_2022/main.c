@@ -5,7 +5,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #define DEFAULT_PORT "27015"
-#define MY_LOCAL_IP "211.215.249.35"
+#define MY_LOCAL_IP "172.20.10.2"
 
 // Client의 동작 순서
 // 1. 소켓 생성 -> 2. 서버에 Connect -> 3. Send data -> 4. Recieve Reply
@@ -48,7 +48,7 @@ int main() {
 
     server.sin_addr.s_addr = inet_addr(MY_LOCAL_IP); // 서버 IP
     server.sin_family = AF_INET; // IPv4
-    server.sin_port = htons(80); // 사용할 포트 번호 지정
+    server.sin_port = htons(9090); // 사용할 포트 번호 지정
 
     // 3. Connect to server
     if (connect(clientSocket, (struct sockaddr*)&server, sizeof(server)) < 0) {
@@ -87,9 +87,9 @@ int main() {
         puts(server_reply);
     }
     
-    
-    
-    
+    getchar();
+    //Sleep(5000);
+
     closesocket(clientSocket);
     WSACleanup();
 }
