@@ -1,5 +1,8 @@
 ﻿  main.c
-C:\Users\Junseok\oneclick\client_2022\client_2022\main.c(4,1): warning C4005: '_WINSOCK_DEPRECATED_NO_WARNINGS': 매크로 재정의
+C:\Users\Junseok\oneclick\client_2022\client_2022\main.c(5,1): warning C4005: '_WINSOCK_DEPRECATED_NO_WARNINGS': 매크로 재정의
 C:\Users\Junseok\oneclick\client_2022\client_2022\main.c : message : '_WINSOCK_DEPRECATED_NO_WARNINGS'의 이전 정의를 참조하십시오.
-C:\Users\Junseok\oneclick\client_2022\client_2022\main.c(62,43): warning C4267: '함수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Junseok\oneclick\client_2022\client_2022\main.c(6,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': 매크로 재정의
+C:\Users\Junseok\oneclick\client_2022\client_2022\main.c : message : '_CRT_SECURE_NO_WARNINGS'의 이전 정의를 참조하십시오.
+C:\Users\Junseok\oneclick\client_2022\client_2022\main.c(66,9): warning C4013: 'gets'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+C:\Users\Junseok\oneclick\client_2022\client_2022\main.c(71,43): warning C4267: '함수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   client_2022.vcxproj -> C:\Users\Junseok\oneclick\client_2022\x64\Debug\client_2022.exe
