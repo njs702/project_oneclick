@@ -5,7 +5,8 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #define DEFAULT_PORT "27015"
-#define MY_LOCAL_IP "172.20.10.2"
+#define MY_LOCAL_IP "211.215.249.35"
+//#define MY_LOCAL_IP "211.108.241.184"
 
 // Client의 동작 순서
 // 1. 소켓 생성 -> 2. 서버에 Connect -> 3. Send data -> 4. Recieve Reply
@@ -17,7 +18,7 @@ int main() {
     struct sockaddr_in server;
     char server_reply[2000];
     int recv_size;
-    char* message;
+    char* message = malloc(sizeof(char) * 100);
 
     // initializing Winsock
     Sleep(2000);
@@ -60,32 +61,34 @@ int main() {
     }
 
     // 4. Send data
-    
-    //message = malloc(sizeof(char) * 100);
-    //printf("Enter your message : ");
-    //gets(message);
-    /*if (message == NULL) {
-        message = "Hi I'M client!!!";
-    }*/
-    message = "Hi I'M client!!!";
-    if (send(clientSocket, message, strlen(message), 0) < 0) {
-        printf("Send failed!\n");
-        return 1;
-    }
-    else {
-        printf("Message send : %s\n", message);
-        //free(message);
-    }
+    while (1) {
+        //message
+        printf("Enter your message : ");
+        gets(message);
+        /*if (message == NULL) {
+            message = "Hi I'M client!!!";
+        }*/
+        //message = "Hi I'M client!!!";
+        if (send(clientSocket, message, strlen(message), 0) < 0) {
+            printf("Send failed!\n");
+            return 1;
+        }
+        else {
+            printf("Message send : %s\n", message);
+            //free(message);
+        }
 
-    // 5. Receive reply from server
-    if ((recv_size = recv(clientSocket, server_reply, 2000, 0)) == SOCKET_ERROR) {
-        printf("Receive failed!\n");
+        // 5. Receive reply from server
+        if ((recv_size = recv(clientSocket, server_reply, 2000, 0)) == SOCKET_ERROR) {
+            printf("Receive failed!\n");
+        }
+        else {
+            printf("Reply received : \n");
+            server_reply[recv_size] = '\0';
+            puts(server_reply);
+        }
     }
-    else {
-        printf("Reply received!\n");
-        server_reply[recv_size] = '\0';
-        puts(server_reply);
-    }
+    
     
     getchar();
     //Sleep(5000);

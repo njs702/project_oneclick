@@ -123,7 +123,7 @@ int main() {
 
 
 			// 6. 연결 요청이 들어온 client에 welcome message send하기
-			message = "Welcom client!!";
+			message = "Welcom client!!\n";
 			if (send(newSocket, message, strlen(message), 0) != strlen(message)) {
 				perror("send failed");
 			}
