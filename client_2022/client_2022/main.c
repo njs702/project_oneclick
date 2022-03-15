@@ -46,7 +46,7 @@ int main() {
 
     server.sin_addr.s_addr = inet_addr(MY_LOCAL_IP); // 서버 IP
     server.sin_family = AF_INET; // IPv4
-    server.sin_port = htons(9090); // 사용할 포트 번호 지정
+    server.sin_port = htons(8888); // 사용할 포트 번호 지정
 
     // 3. Connect to server
     if (connect(clientSocket, (struct sockaddr*)&server, sizeof(server)) < 0) {

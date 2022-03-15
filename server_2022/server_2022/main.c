@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <WinSock2.h>
 #include <string.h>
+#include <io.h>
 #define DEFAULT_PORT "27015"
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
@@ -45,7 +46,7 @@ int main() {
 	//server.sin_addr.s_addr = INADDR_ANY; // 자동으로 이 컴퓨터에 존재하는 랜카드 중 사용가능한 랜카드의 IP주소 사용
 	server.sin_addr.s_addr = inet_addr("211.215.249.35");
 	server.sin_family = AF_INET; // IPv4
-	server.sin_port = htons(9090); // 사용할 포트 번호 지정
+	server.sin_port = htons(8888); // 사용할 포트 번호 지정
 
 	// 3. Socket 생성 후 Bind
 	if (bind(serverSocket, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR) {
@@ -72,26 +73,22 @@ int main() {
 		printf("Waiting for incoming connections...\n");
 	}
 
-	// 5. Client의 연결 요청을 수락하기
+	// 5. Client의 연결 요청을 accept하기
 	c = sizeof(struct sockaddr_in);
 	clientSocket = INVALID_SOCKET;
-	clientSocket = accept(serverSocket, NULL, NULL);
+	
+	while ((clientSocket = accept(serverSocket, NULL, NULL))!=INVALID_SOCKET) {
+		printf("Connection accepted!\n");
+		// 6. Reply to Client
+		message = "Hello Client!!!\n";
+		send(clientSocket, message, strlen(message), 0);
+	}
 	if (clientSocket == INVALID_SOCKET) {
 		printf("accept failed: %d\n", WSAGetLastError());
 		closesocket(serverSocket);
 		WSACleanup();
 		return 1;
 	}
-	else {
-		printf("Connection accepted!\n");
-	}
-
-
-	// 6. Reply to Client
-	message = "Hello Client!!!\n";
-	send(clientSocket, message, strlen(message), 0);
-
-	getchar();
 
 
 	closesocket(clientSocket);
