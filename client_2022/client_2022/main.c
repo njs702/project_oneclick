@@ -14,6 +14,8 @@ int main() {
     SOCKET clientSocket;
     struct sockaddr_in server;
 
+    char* message;
+
     // initializing Winsock
     Sleep(2000);
     printf("Initializing Winsock...\n");
@@ -54,4 +56,13 @@ int main() {
         printf("Connection has been completed!\n");
     }
 
+    // 4. Send data
+    message = "Hi I'm client!!!\n";
+    if (send(clientSocket, message, strlen(message), 0) < 0) {
+        printf("Send failed!\n");
+        return 1;
+    }
+    else {
+        printf("Message send : %s\n", message);
+    }
 }
