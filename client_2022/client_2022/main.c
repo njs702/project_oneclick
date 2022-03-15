@@ -13,7 +13,8 @@ int main() {
     WSADATA wsaData;
     SOCKET clientSocket;
     struct sockaddr_in server;
-
+    char* server_reply[2000];
+    int recv_size;
     char* message;
 
     // initializing Winsock
@@ -65,4 +66,13 @@ int main() {
     else {
         printf("Message send : %s\n", message);
     }
+
+    // 5. Receive reply from server
+    if ((recv_size = recv(clientSocket, server_reply, 2000, 0)) == SOCKET_ERROR) {
+        printf("Receive failed!\n");
+    }
+    else {
+        printf("Reply received!\n");
+    }
+    //server_reply[recv_size] = NULL;
 }
