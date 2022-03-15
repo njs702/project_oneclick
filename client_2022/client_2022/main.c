@@ -61,20 +61,20 @@ int main() {
 
     // 4. Send data
     
-    message = malloc(sizeof(char) * 100);
-    printf("Enter your message : ");
-    gets(message);
-    if (message == NULL) {
+    //message = malloc(sizeof(char) * 100);
+    //printf("Enter your message : ");
+    //gets(message);
+    /*if (message == NULL) {
         message = "Hi I'M client!!!";
-    }
-
+    }*/
+    message = "Hi I'M client!!!";
     if (send(clientSocket, message, strlen(message), 0) < 0) {
         printf("Send failed!\n");
         return 1;
     }
     else {
         printf("Message send : %s\n", message);
-        free(message);
+        //free(message);
     }
 
     // 5. Receive reply from server
