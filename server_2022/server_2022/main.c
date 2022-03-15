@@ -62,7 +62,7 @@ int main() {
 	//server.sin_addr.s_addr = INADDR_ANY; // 자동으로 이 컴퓨터에 존재하는 랜카드 중 사용가능한 랜카드의 IP주소 사용
 	server.sin_addr.s_addr = inet_addr("211.215.249.35");
 	server.sin_family = AF_INET; // IPv4
-	server.sin_port = htons(8888); // 사용할 포트 번호 지정
+	server.sin_port = htons(80); // 사용할 포트 번호 지정
 
 	// 3. Socket 생성 후 Bind
 	if (bind(serverSocket, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR) {
@@ -109,7 +109,7 @@ int main() {
 
 
 		if (activity == SOCKET_ERROR) {
-			perror("accept");
+			perror("accept error");
 			exit(EXIT_FAILURE);
 		}
 
@@ -121,6 +121,13 @@ int main() {
 			}
 			printf("New connection, socket fd is %d, ip is : %s, port : %d\n", newSocket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 		}
+
+		// 6. 연결 요청이 들어온 client에 welcome message send하기
+		message = "Welcom client!!";
+		if (send(newSocket, message, strlen(message), 0) != strlen(message)) {
+			perror("send failed");
+		}
+		printf("Welcom message sent successfully to %s\n", inet_ntoa(address.sin_addr));
 	}
 
 	/*c = sizeof(struct sockaddr_in);
