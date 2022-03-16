@@ -63,12 +63,18 @@ int main() {
     // 4. Send data
     while (1) {
         //message
-        printf("Enter your message : ");
+        printf("Enter your message(#exit to quit) : ");
         gets(message);
-        /*if (message == NULL) {
-            message = "Hi I'M client!!!";
-        }*/
-        //message = "Hi I'M client!!!";
+        if (strcmp(message, "#exit") == 0) {
+            int iResult = shutdown(clientSocket, SD_SEND);
+            if (iResult == SOCKET_ERROR) {
+                printf("Shutdown failed : %d\n", WSAGetLastError());
+                closesocket(clientSocket);
+                WSACleanup();
+                return 1;
+            }
+            break;
+        }
         if (send(clientSocket, message, strlen(message), 0) < 0) {
             printf("Send failed!\n");
             return 1;

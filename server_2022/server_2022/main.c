@@ -19,6 +19,7 @@ int main() {
 	SOCKET serverSocket;
 	SOCKET newSocket;
 	SOCKET s;
+	SOCKET t;
 	SOCKET master, client_socket[CLIENT_SOCKET_NUMBER]; // master 사용하지 않음 위에 serverSocket 사용
 	struct sockaddr_in server;
 	struct sockaddr_in client;
@@ -123,11 +124,11 @@ int main() {
 
 
 			// 6. 연결 요청이 들어온 client에 welcome message send하기
-			message = "Welcom client!!\n";
+			message = "Welcome client!!\n";
 			if (send(newSocket, message, strlen(message), 0) != strlen(message)) {
 				perror("send failed");
 			}
-			printf("Welcom message sent successfully to %s\n", inet_ntoa(address.sin_addr));
+			printf("Welcome message sent successfully to %s\n", inet_ntoa(address.sin_addr));
 
 			// add new socket to array of sockets
 			for (int i = 0; i < max_clients; i++) {
@@ -149,6 +150,7 @@ int main() {
 
 					// 7. client로부터 오는 데이터 읽어들이기
 					valread = recv(s, buffer, MAXRECV, 0);
+
 					if (valread == SOCKET_ERROR) {
 						int error_code = WSAGetLastError();
 						if (error_code == WSAECONNRESET) {
@@ -162,50 +164,31 @@ int main() {
 					}
 					if (valread == 0) {
 						// client가 정상적으로 연결 끊음, 정보 표시
-						printf("Host disconnected unexpectedly, ip : %s, port %d\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
+						printf("Host disconnected, ip : %s, port %d\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
 						// 해당 소켓 close 후 0으로 표시(재사용을 위해)
 						closesocket(s);
 						client_socket[i] = 0;
 					}
+
 					// Echo back the message that came in
 					else {
 						// add null character, 문자열을 다루기 위한 작업
 						buffer[valread] = '\0';
 						printf("%s:%d - %s\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), buffer);
-						send(s, buffer, valread, 0);
+						/*for (int i = 0; i < max_clients; i++) {
+							if (client_socket != 0) {
+								send(client_socket[i], buffer, valread, 0);
+								printf("client_socket[%d] = %d\n", i, client_socket[i]);
+							}
+						}*/
+						//send(s, buffer, valread, 0);
+						send(client_socket[1], buffer, valread, 0);
 					}
 				}
 			}
 		}
 	}
-
-	/*c = sizeof(struct sockaddr_in);
-	newSocket = INVALID_SOCKET;
-	
-	while ((newSocket = accept(serverSocket, NULL, NULL))!=INVALID_SOCKET) {
-		printf("Connection accepted!\n");
-		char* recv_buf = malloc(sizeof(char)* (MAXRECV+1));
-		//message = malloc(sizeof(char) * 1000);
-		int recv_size;
-		// 5.1 Client로부터 온 Data Read
-		recv_size = recv(newSocket, recv_buf, strlen(recv_buf), 0);
-		recv_buf[recv_size] = '\0';
-		printf("Message from Client : %s\n", recv_buf);
-
-		// 6. Reply to Client
-		//strcpy(message, recv_buf);
-		message = "Hello client! ";
-		send(newSocket, message, strlen(message), 0);
-		free(recv_buf);
-		//free(message);
-	}
-	if (newSocket == INVALID_SOCKET) {
-		printf("accept failed: %d\n", WSAGetLastError());
-		closesocket(serverSocket);
-		WSACleanup();
-		return 1;
-	}*/
 
 
 	closesocket(newSocket);
