@@ -12,7 +12,8 @@
 HANDLE hMutex; // 뮤텍스 선언
 
 int ret = 0;
-
+SOCKET clientSocket = 0;
+// 클라이언트 초기화 및 서버 접속
 int client_init() {
 	WSADATA wsaData;
 	SOCKET s;
@@ -59,9 +60,37 @@ int client_init() {
 	return s;
 }
 
+// 메시지 받는 스레드 함수
+void recv_thread(void* pData) {
+	int ret_thread = 65535;
+	char buff_thread[1024] = { 0 };
+
+	// 스레드용 리턴 값이 원하는 값이 아니면 받는 중에 서버와 통신이 끊긴 것
+	while (ret_thread != INVALID_SOCKET || ret_thread != SOCKET_ERROR) {
+		Sleep(10);
+
+		// 서버에서 주는 메시지를 실시간으로 기다렸다가 받는다.
+		ret_thread = recv(clientSocket, buff_thread, sizeof(buff_thread), 0);
+
+		// 서버에서 받는 작업을 한 결과 비정상이면 탈출
+		if (ret_thread == INVALID_SOCKET || ret_thread == SOCKET_ERROR) {
+			break;
+		}
+
+		// 정상적으로 받는다면 받은 버퍼 출력
+		printf("\nmessage recieve : %s\n", buff_thread);
+		memset(buff_thread, 0, 1024); // 버퍼 초기화
+	}
+
+	// 작업 끝난 소켓 초기화
+	WaitForSingleObject(hMutex, 100L);
+	ret = INVALID_SOCKET;
+	ReleaseMutex(hMutex);
+	return;
+}
+
 int main() {
 	// 뮤텍스 초기화
-	SOCKET clientSocket;
 	struct sockaddr_in client;
 	hMutex = CreateMutex(NULL, FALSE, NULL);
 	char buff[1024];
@@ -81,13 +110,43 @@ int main() {
 	}
 
 	// 3.5 Receive welcome message from server
-	if ((recv_size = recv(clientSocket, buff, 1024, 0)) == SOCKET_ERROR) {
+	if ((ret = recv(clientSocket, buff, 1024, 0)) == SOCKET_ERROR) {
 		printf("Receive failed!\n");
 	}
 	else {
 		printf("Welcome message from server : \n");
-		buff[recv_size] = '\0';
+		buff[ret] = '\0';
 		puts(buff);
 	}
+
+	if (!strcmp("Client Full!\n", buff)) {
+		closesocket(clientSocket);
+		WSACleanup();
+		return 0;
+	}
+
+	// 정상 접속이 되면 스레드 작동 - 받는 메시지 스레드 실시간 수행
+	_beginthread(recv_thread, 0, NULL);
+
+	// 보내는 메시지는 스레드로 넣을 필요가 없음
+	// 전송 결과 잘못된 값을 얻으면 탈출
+	while (ret != INVALID_SOCKET || ret != SOCKET_ERROR) {
+		Sleep(10);
+		printf("보낼 메시지 입력 : ");
+		fgets(buff, 1024, stdin);
+		printf("\n");
+		if (strcmp(buff, "#exit") == 0) {
+			break;
+		}
+
+		// 서버로 보내는 글은 fgets를 받고 나서 순차적으로 보냄
+		ret = send(clientSocket, buff, strlen(buff), 0);
+		
+		memset(buff, 0, 1024);
+	}
+	printf("서버와 연결이 끊어졌습니다(PRESS ANY KEY)\n");
+	closesocket(clientSocket);
+	WSACleanup();
+
 	getchar();
 }
