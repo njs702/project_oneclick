@@ -46,6 +46,7 @@ int main() {
 		printf("WSAStartup completed!!\n");
 	}
 
+
 	// 2. 초기화 후 서버에서 사용할 SOCKET 인스턴스 생성
 	// socket() function is used to create a socket
 	if ((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
@@ -61,7 +62,7 @@ int main() {
 	}
 
 	//server.sin_addr.s_addr = INADDR_ANY; // 자동으로 이 컴퓨터에 존재하는 랜카드 중 사용가능한 랜카드의 IP주소 사용
-	server.sin_addr.s_addr = inet_addr("211.215.249.35");
+	server.sin_addr.s_addr = inet_addr("127.0.0.1");
 	server.sin_family = AF_INET; // IPv4
 	server.sin_port = htons(9090); // 사용할 포트 번호 지정
 
@@ -120,10 +121,12 @@ int main() {
 				perror("accept");
 				exit(EXIT_FAILURE);
 			}
+			// 연결 요청한 Host의 정보들 표시
 			printf("New connection, socket fd is %d, ip is : %s, port : %d\n", newSocket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
 
 			// 6. 연결 요청이 들어온 client에 welcome message send하기
+			//message = malloc(sizeof(char) * strlen(inet_ntoa(address.sin_addr)) + 20);
 			message = "Welcome client!!\n";
 			if (send(newSocket, message, strlen(message), 0) != strlen(message)) {
 				perror("send failed");
@@ -176,14 +179,8 @@ int main() {
 						// add null character, 문자열을 다루기 위한 작업
 						buffer[valread] = '\0';
 						printf("%s:%d - %s\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), buffer);
-						/*for (int i = 0; i < max_clients; i++) {
-							if (client_socket != 0) {
-								send(client_socket[i], buffer, valread, 0);
-								printf("client_socket[%d] = %d\n", i, client_socket[i]);
-							}
-						}*/
 						//send(s, buffer, valread, 0);
-						send(client_socket[1], buffer, valread, 0);
+						send(s, buffer, valread, 0);
 					}
 				}
 			}

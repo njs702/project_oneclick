@@ -5,7 +5,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #define DEFAULT_PORT "27015"
-#define MY_LOCAL_IP "211.215.249.35"
+#define MY_LOCAL_IP "127.0.0.1"
 //#define MY_LOCAL_IP "211.108.241.184"
 
 // Client의 동작 순서
@@ -60,6 +60,16 @@ int main() {
         printf("Connection has been completed!\n");
     }
 
+    // 5. Receive reply from server
+    if ((recv_size = recv(clientSocket, server_reply, 2000, 0)) == SOCKET_ERROR) {
+        printf("Receive failed!\n");
+    }
+    else {
+        printf("Welcome message from server : \n");
+        server_reply[recv_size] = '\0';
+        puts(server_reply);
+    }
+
     // 4. Send data
     while (1) {
         //message
@@ -95,7 +105,7 @@ int main() {
         }
     }
     
-    
+    printf("Thank you, bye!(press any key)\n");
     getchar();
     //Sleep(5000);
 
