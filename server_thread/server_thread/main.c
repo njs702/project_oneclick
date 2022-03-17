@@ -105,7 +105,7 @@ void recv_client(void* ns) {
 			ReleaseMutex(hMutex);
 		}
 		if (strlen(buff) != 0) {
-			printf("%d에 메시지 보냄 : %s", strlen(buff), buff);
+			printf("메시지 보냄 : %s", buff);
 		}
 		memset(buff, 0, 1024);
 	}
@@ -163,7 +163,7 @@ int main() {
 			if (send(client_sock[seat], message, strlen(message), 0) != strlen(message)) {
 				perror("send failed");
 			}
-			printf("Welcome message sent successfully to %s\n", inet_ntoa(client.sin_addr));
+			printf("Client Full message was sent to %s\n", inet_ntoa(client.sin_addr));
 		}
 	}
 }
