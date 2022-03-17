@@ -68,6 +68,7 @@ int server_init() {
 		Sleep(2000);
 		printf("Waiting for incoming connections...\n");
 	}
+	return s;
 	
 }
 
@@ -141,8 +142,8 @@ int main() {
 		//Blocking 방식으로 Client 대기
 		client_sock[seat] = accept(serverSocket, (struct sockaddr*)&client, (int*) & addrlen);
 		if (client_num < MAX_CLIENTS) {
-			if (client_sock[seat] != INVALID_SOCKET || client_sock[seat] != SOCKET_ERROR){
-				_beginthreadex(NULL, 0, recv_client, (void*)0, 0, &client_sock[seat]);
+			if (!(client_sock[seat] == INVALID_SOCKET || client_sock[seat] == SOCKET_ERROR)){
+				_beginthread(recv_client, 0, &client_sock[seat]);
 				Sleep(10);
 				printf("New connection, %dth client, ip is : %s, port : %d\n", seat, inet_ntoa(client.sin_addr), ntohs(client.sin_port));
 			}

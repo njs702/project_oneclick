@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "8eeaa772-c92a-4df2-afed-b317a643bb43": {
+      "ProjectGuid": "8eeaa772-c92a-4df2-afed-b317a643bb43",
+      "DisplayName": "client_thread",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}

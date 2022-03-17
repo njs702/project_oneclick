@@ -1,0 +1,8 @@
+﻿  main.c
+C:\Users\USER\project1_oneclick\project_oneclick\client_thread\client_thread\main.c(6,1): warning C4005: '_WINSOCK_DEPRECATED_NO_WARNINGS': 매크로 재정의
+C:\Users\USER\project1_oneclick\project_oneclick\client_thread\client_thread\main.c : message : '_WINSOCK_DEPRECATED_NO_WARNINGS'의 이전 정의를 참조하십시오.
+C:\Users\USER\project1_oneclick\project_oneclick\client_thread\client_thread\main.c(7,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': 매크로 재정의
+C:\Users\USER\project1_oneclick\project_oneclick\client_thread\client_thread\main.c : message : '_CRT_SECURE_NO_WARNINGS'의 이전 정의를 참조하십시오.
+C:\Users\USER\project1_oneclick\project_oneclick\client_thread\client_thread\main.c(59,9): warning C4244: 'return': 'SOCKET'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\USER\project1_oneclick\project_oneclick\client_thread\client_thread\main.c(65,21): warning C4101: 'client' :참조되지 않은 지역 변수입니다.
+  client_thread.vcxproj -> C:\Users\USER\project1_oneclick\project_oneclick\client_thread\x64\Debug\client_thread.exe
