@@ -188,11 +188,11 @@ int main() {
 						// add null character, 문자열을 다루기 위한 작업
 						buffer[valread] = '\0';
 						printf("%s:%d - %s\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), buffer);
-						for (int i = 0; i < max_clients; i++) {
+						/*for (int i = 0; i < max_clients; i++) {
 							temp_socket = client_socket[i];
 							send(temp_socket, buffer, valread, 0);
-						}
-						// send(s, buffer, valread, 0);
+						}*/
+						send(s, buffer, valread, 0);
 					}
 				}
 			}

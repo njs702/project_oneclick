@@ -110,28 +110,6 @@ int main() {
         puts(server_reply);
     } 
 
-    printf("Enter your message(#exit to quit) : ");
-    gets(message);
-    if (strcmp(message, "#exit") == 0) {
-        int iResult = shutdown(clientSocket, SD_SEND);
-        if (iResult == SOCKET_ERROR) {
-            printf("Shutdown failed : %d\n", WSAGetLastError());
-            closesocket(clientSocket);
-            WSACleanup();
-            return 1;
-        }
-    }
-    if (send(clientSocket, message, strlen(message), 0) < 0) {
-        printf("Send failed!\n");
-        return 1;
-    }
-    else {
-        printf("Message send : %s\n", message);
-        //free(message);
-    }
-
-
-
     // 4. Send data
     while (1) {
         //message
