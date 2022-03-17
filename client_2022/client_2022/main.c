@@ -2,11 +2,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <WinSock2.h>
+#include <process.h>
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #define DEFAULT_PORT "27015"
 #define MY_LOCAL_IP "127.0.0.1"
 //#define MY_LOCAL_IP "211.108.241.184"
+
+unsigned int WINAPI do_chat_service(void* params)
+{
+    SOCKET s = (SOCKET)params;
+    char recv_message[MAXBYTE];
+    int len = 0;
+    int index = 0;
+    WSANETWORKEVENTS ev;
+    HANDLE event = WSACreateEvent();
+
+    WSAEventSelect(s, event, FD_READ | FD_CLOSE);
+    while (1)
+    {
+        index = WSAWaitForMultipleEvents(1, &event, FALSE, INFINITE, FALSE);
+        if ((index != WSA_WAIT_FAILED) && (index != WSA_WAIT_TIMEOUT))
+        {
+            WSAEnumNetworkEvents(s, event, &ev);
+            if (ev.lNetworkEvents == FD_READ)
+            {
+                int len = recv(s, recv_message, MAXBYTE, 0);
+                if (len > 0)
+                    printf("%s\n", recv_message);
+            }
+            else if (ev.lNetworkEvents == FD_CLOSE)
+            {
+                printf(" >> 서버 서비스가 중단되었습니다.(종료: \"/x\")\n");
+                closesocket(s);
+                break;
+            }
+        }
+    }
+    WSACleanup();
+    _endthreadex(0);
+
+    return 0;
+}
+
 
 // Client의 동작 순서
 // 1. 소켓 생성 -> 2. 서버에 Connect -> 3. Send data -> 4. Recieve Reply
@@ -14,11 +52,13 @@
 int main() {
 
     WSADATA wsaData;
+    unsigned int tid;
     SOCKET clientSocket;
     struct sockaddr_in server;
     char server_reply[2000];
     int recv_size;
     char* message = malloc(sizeof(char) * 100);
+    HANDLE mainthread;
 
     // initializing Winsock
     Sleep(2000);
@@ -60,7 +100,7 @@ int main() {
         printf("Connection has been completed!\n");
     }
 
-    // 5. Receive reply from server
+    // 3.5 Receive welcome message from server
     if ((recv_size = recv(clientSocket, server_reply, 2000, 0)) == SOCKET_ERROR) {
         printf("Receive failed!\n");
     }
@@ -68,7 +108,29 @@ int main() {
         printf("Welcome message from server : \n");
         server_reply[recv_size] = '\0';
         puts(server_reply);
+    } 
+
+    printf("Enter your message(#exit to quit) : ");
+    gets(message);
+    if (strcmp(message, "#exit") == 0) {
+        int iResult = shutdown(clientSocket, SD_SEND);
+        if (iResult == SOCKET_ERROR) {
+            printf("Shutdown failed : %d\n", WSAGetLastError());
+            closesocket(clientSocket);
+            WSACleanup();
+            return 1;
+        }
     }
+    if (send(clientSocket, message, strlen(message), 0) < 0) {
+        printf("Send failed!\n");
+        return 1;
+    }
+    else {
+        printf("Message send : %s\n", message);
+        //free(message);
+    }
+
+
 
     // 4. Send data
     while (1) {
@@ -78,10 +140,10 @@ int main() {
         if (strcmp(message, "#exit") == 0) {
             int iResult = shutdown(clientSocket, SD_SEND);
             if (iResult == SOCKET_ERROR) {
-                printf("Shutdown failed : %d\n", WSAGetLastError());
-                closesocket(clientSocket);
-                WSACleanup();
-                return 1;
+                    printf("Shutdown failed : %d\n", WSAGetLastError());
+                    closesocket(clientSocket);
+                    WSACleanup();
+                    return 1;
             }
             break;
         }
@@ -99,11 +161,12 @@ int main() {
             printf("Receive failed!\n");
         }
         else {
-            printf("Reply received : \n");
+            printf("Message received : ");
             server_reply[recv_size] = '\0';
             puts(server_reply);
         }
     }
+    
     
     printf("Thank you, bye!(press any key)\n");
     getchar();

@@ -3,15 +3,15 @@ C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(
 C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c : message : '_WINSOCK_DEPRECATED_NO_WARNINGS'의 이전 정의를 참조하십시오.
 C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(10,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': 매크로 재정의
 C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c : message : '_CRT_SECURE_NO_WARNINGS'의 이전 정의를 참조하십시오.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(19,11): warning C4098: 'init_winsock': 'void' 함수에서 값을 반환하고 있습니다.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(130,11): warning C4477: 'printf' : 서식 문자열 '%d'에 'int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'SOCKET'입니다.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(130,11): message : 서식 문자열에서 '%lld'을(를) 사용하는 것이 좋습니다.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(130,11): message : 서식 문자열에서 '%Id'을(를) 사용하는 것이 좋습니다.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(130,11): message : 서식 문자열에서 '%I64d'을(를) 사용하는 것이 좋습니다.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(136,39): warning C4267: '함수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(41,61): warning C4101: 'i' :참조되지 않은 지역 변수입니다.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(40,6): warning C4101: 'c' :참조되지 않은 지역 변수입니다.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(34,9): warning C4101: 't' :참조되지 않은 지역 변수입니다.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(35,9): warning C4101: 'master' :참조되지 않은 지역 변수입니다.
-C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(37,21): warning C4101: 'client' :참조되지 않은 지역 변수입니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(20,11): warning C4098: 'init_winsock': 'void' 함수에서 값을 반환하고 있습니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(134,11): warning C4477: 'printf' : 서식 문자열 '%d'에 'int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'SOCKET'입니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(134,11): message : 서식 문자열에서 '%lld'을(를) 사용하는 것이 좋습니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(134,11): message : 서식 문자열에서 '%Id'을(를) 사용하는 것이 좋습니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(134,11): message : 서식 문자열에서 '%I64d'을(를) 사용하는 것이 좋습니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(140,39): warning C4267: '함수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(45,61): warning C4101: 'i' :참조되지 않은 지역 변수입니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(44,6): warning C4101: 'c' :참조되지 않은 지역 변수입니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(37,9): warning C4101: 't' :참조되지 않은 지역 변수입니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(39,9): warning C4101: 'master' :참조되지 않은 지역 변수입니다.
+C:\Users\USER\project1_oneclick\project_oneclick\server_2022\server_2022\main.c(41,21): warning C4101: 'client' :참조되지 않은 지역 변수입니다.
   server_2022.vcxproj -> C:\Users\USER\project1_oneclick\project_oneclick\server_2022\x64\Debug\server_2022.exe

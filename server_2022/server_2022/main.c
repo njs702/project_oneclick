@@ -13,6 +13,7 @@
 // Winsock 초기화 -> socket 생성 -> network 통신 -> socket 닫기 -> Winsock 종료
 
 void init_winsock() {
+	//WSADATA 구조체에는 Windows 소켓 구현에 대한 정보가 포함되어 있음
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
 		printf("WSAStartup failed: %d\n", WSAStartup(MAKEWORD(2, 2), &wsaData));
@@ -24,14 +25,17 @@ void init_winsock() {
 	}
 }
 
+void create_socket() {
+
+}
+
 int main() {
 
-	//WSADATA 구조체에는 Windows 소켓 구현에 대한 정보가 포함되어 있음
-	
 	SOCKET serverSocket;
 	SOCKET newSocket;
 	SOCKET s;
 	SOCKET t;
+	SOCKET temp_socket;
 	SOCKET master, client_socket[CLIENT_SOCKET_NUMBER]; // master 사용하지 않음 위에 serverSocket 사용
 	struct sockaddr_in server;
 	struct sockaddr_in client;
@@ -184,8 +188,11 @@ int main() {
 						// add null character, 문자열을 다루기 위한 작업
 						buffer[valread] = '\0';
 						printf("%s:%d - %s\n", inet_ntoa(address.sin_addr), ntohs(address.sin_port), buffer);
-						//send(s, buffer, valread, 0);
-						send(s, buffer, valread, 0);
+						for (int i = 0; i < max_clients; i++) {
+							temp_socket = client_socket[i];
+							send(temp_socket, buffer, valread, 0);
+						}
+						// send(s, buffer, valread, 0);
 					}
 				}
 			}
