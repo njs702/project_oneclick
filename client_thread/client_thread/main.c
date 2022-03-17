@@ -78,7 +78,7 @@ void recv_thread(void* pData) {
 		}
 
 		// 정상적으로 받는다면 받은 버퍼 출력
-		printf("\nmessage recieve : %s\n", buff_thread);
+		printf("\nmessage recieve : %s", buff_thread);
 		memset(buff_thread, 0, 1024); // 버퍼 초기화
 	}
 
@@ -134,7 +134,6 @@ int main() {
 		Sleep(10);
 		printf("보낼 메시지 입력 : ");
 		fgets(buff, 1024, stdin);
-		printf("\n");
 		if (strcmp(buff, "#exit") == 0) {
 			break;
 		}
