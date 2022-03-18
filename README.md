@@ -470,3 +470,199 @@ WSACleanup();
 * 다수의 클라이언트에서 들어오는 요청을 recv로 처리할 때 쓰레드를 통해 해결한다.
 
 ### 2.4.4 Implementation - SERVER
+> #### SERVER multi_threading의 Listen()까지는 이전의 코드와 같다.
+#### 2.4.4.1 Headers & 전처리, 전역변수 선언
+```C
+#pragma comment(lib,"ws2_32.lib")  // winsock2를 사용하기 위한 lib를 추가합니다.
+#include <stdio.h>
+#include <WinSock2.h>
+#include <process.h>
+#include <string.h>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#define SERVER_IP "127.0.0.1"
+#define SERVER_PORT 9090
+#define MAX_CLIENTS 20
+
+HANDLE hMutex = 0; // 쓰레드 동기화 처리를 위한 뮤텍스
+int client_num = 0; // 클라이언트 개수
+int seat = 0; // 클라이언트 번호
+SOCKET client_sock[65535]; // 클라이언트 welcom socket
+```
+1. 쓰레드의 공유 자원 처리를 위한 mutex를 사용한다.
+2. 이 외의 선언은 다른 프로그램과 같다.
+
+#### 2.4.4.2 accept 이후 recv 처리는 쓰레드를 생성하여 처리한다
+```C
+        //Blocking 방식으로 Client 대기
+	client_sock[seat] = accept(serverSocket, (struct sockaddr*)&client, (int*) & addrlen);
+	if (client_num < MAX_CLIENTS) {
+		if (!(client_sock[seat] == INVALID_SOCKET || client_sock[seat] == SOCKET_ERROR)){
+			_beginthread(recv_client, 0, &client_sock[seat]);
+			Sleep(10);
+			printf("New connection, %dth client, ip is : %s, port : %d\n", seat, inet_ntoa(client.sin_addr), ntohs(client.sin_port));
+		}
+	}
+```
+1. client_sock 배열에는 multiplexing과 마찬가지로 접속하는 클라이언트들이 들어간다
+2. accept를 통해 연결이 완료된 후, recv 작업은 쓰레드가 처리한다.
+3. 이 때 메인 쓰레드와 생성된 쓰레드는 병렬적으로 작업을 수행하게 된다.
+
+#### 2.4.4.3 쓰레드가 recv를 수행하는 함수 구현
+<details>
+<summary>recv_client 함수 보기</summary>
+
+```C
+// 스레드 함수
+void recv_client(void* ns) {
+	// 정상적으로 연결요청 accpet 되었을 때 스레드 실행
+	// 클라이언트의 숫자를 늘림
+
+	// 임계 영역, mutex lock을 활용해 공동 접근 불가능하게 한다
+	WaitForSingleObject(hMutex, INFINITE);
+	client_num++; // 클라이언트 개수 증가
+	seat++; // 클라이언트 번호 증가
+	ReleaseMutex(hMutex);
+
+	char welcome[100] = { 0 };
+	char buff[1024] = { 0 };
+	int ret, i;
+
+	_itoa(seat, welcome, 10);
+	strcat(welcome, "번 클라이언트, 환영합니다\n");
+	ret = send(*(SOCKET*)ns, welcome, sizeof(welcome), 0); // 메시지 전송
+
+	while (ret != SOCKET_ERROR || ret != INVALID_SOCKET) {
+		ret = recv(*(SOCKET*)ns, buff, 1024, 0); //클라이언트로부터 메시지 받음
+
+		// 모든 client에게 broadcast
+		for (i = 0; i < 65535; i++) {
+			// 받은 클라이언트 소켓의 메모리 주소와
+			// 보내는 클라이언트의 소켓 메모리 주소가 다르면 전송
+			WaitForSingleObject(hMutex, INFINITE);
+			if ((unsigned*)&client_sock[i] != (SOCKET*)ns) {
+				send(client_sock[i], buff, strlen(buff), 0);
+			}
+			ReleaseMutex(hMutex);
+		}
+		if (strlen(buff) != 0) {
+			printf("메시지 보냄 : %s", buff);
+		}
+		memset(buff, 0, 1024);
+	}
+
+	// 접속된 소켓이 연결을 해제 시켰을때 
+	WaitForSingleObject(hMutex,INFINITE);
+	client_num--;
+	ReleaseMutex(hMutex);
+	ReleaseMutex(hMutex);
+	return;
+}
+```
+
+</details>
+
+1. 전역 변수 client_num과 seat을 관리하기 위해 해당 임계 영역은 mutex로 관리
+2. 연결이 완료되었다면, 서버에서 클라이언트로 1회 연결 확인 메시지를 보내게 된다.
+3. 만약 잘 보냈다면(ret != error), 이 쓰레드는 recv 작업을 수행한다.
+4. 모든 client에게 broadcast로 recieve 한 메시지를 전달한다
+5. 접속한 client가 접속을 종료하면 mutex 초기화, client number 감소
+
+#### 2.4.4.4 서버 종료 및 초기화
+```C
+if (client_sock[seat] == INVALID_SOCKET) {
+	printf("accept error");
+	closesocket(client_sock[seat]);
+	closesocket(serverSocket);
+	WSACleanup();
+	return 1;
+}
+```
+1. 사용했던 서버 및 받아온 클라이언트 초기화
+2. 사용한 Winsock 초기화
+
+### 2.4.5 Implementation - CLIENT
+> #### CLIENT multi_threading의 connect()까지는 이전의 코드와 같다.
+#### 2.4.5.1 connect가 완료되었다면 thread를 통해 recv 함수를 수행한다
+```C
+        // 3.5 Receive welcome message from server
+	if ((ret = recv(clientSocket, buff, 1024, 0)) == SOCKET_ERROR) {
+		printf("Receive failed!\n");
+	}
+	else {
+		printf("Welcome message from server : \n");
+		buff[ret] = '\0';
+		puts(buff);
+	}
+
+	if (!strcmp("Client Full!\n", buff)) {
+		closesocket(clientSocket);
+		WSACleanup();
+		return 0;
+	}
+
+	// 정상 접속이 되면 스레드 작동 - 받는 메시지 스레드 실시간 수행
+	_beginthread(recv_thread, 0, NULL);
+```
+1. _beginthread를 통해 쓰레드 생성 후 recv 수행
+
+#### 2.4.5.2 쓰레드가 recv를 수행하는 함수를 구현
+<details>
+<summary>recv_thread 함수 보기</summary>
+
+```C
+// 메시지 받는 스레드 함수
+void recv_thread(void* pData) {
+	int ret_thread = 65535;
+	char buff_thread[1024] = { 0 };
+
+	// 스레드용 리턴 값이 원하는 값이 아니면 받는 중에 서버와 통신이 끊긴 것
+	while (ret_thread != INVALID_SOCKET || ret_thread != SOCKET_ERROR) {
+		Sleep(10);
+
+		// 서버에서 주는 메시지를 실시간으로 기다렸다가 받는다.
+		ret_thread = recv(clientSocket, buff_thread, sizeof(buff_thread), 0);
+
+		// 서버에서 받는 작업을 한 결과 비정상이면 탈출
+		if (ret_thread == INVALID_SOCKET || ret_thread == SOCKET_ERROR) {
+			break;
+		}
+
+		// 정상적으로 받는다면 받은 버퍼 출력
+		printf("\nmessage recieve : %s", buff_thread);
+		memset(buff_thread, 0, 1024); // 버퍼 초기화
+	}
+
+	// 작업 끝난 소켓 초기화
+	WaitForSingleObject(hMutex, 100L);
+	ret = INVALID_SOCKET;
+	ReleaseMutex(hMutex);
+	return;
+}
+```
+
+</details>
+
+1. 서버와 통신이 끊기지 않았다면, 무한 루프를 돌며 서버에서 주는 메시지를 기다렸다가 받는다.
+2. 서버에서 받은 작업을 한 결과 비정상이면 무한 루프 탈출 후 소켓 초기화
+3. 정상적으로 받았다면 받은 메시지 버퍼를 출력한다.
+
+# 3. 프로젝트 마무리
+## 3.1 문제 발생 부분
+## 3.2 문제 해결
+## 3.3 부족했던 점 & 아쉬운 점
+
+# 4. References
+[소켓 통신 관련] - [https://yumdevelop.blogspot.com/2018/04/network-server-client-socket.html](https://yumdevelop.blogspot.com/2018/04/network-server-client-socket.html)
+
+[Basic socket 통신 관련] - [https://badayak.com/4472](https://badayak.com/4472)
+
+[Winsock 활용 및 정보 관련] - [https://ehpub.co.kr/tag/wsadata-%ED%98%95%EC%8B%9D/](https://ehpub.co.kr/tag/wsadata-%ED%98%95%EC%8B%9D/)
+
+[소켓 멀티플렉싱 통신 관련] - [https://ehpub.co.kr/5-wsaeventselect%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EB%A9%80%ED%8B%B0%ED%94%8C%EB%A0%89%EC%8B%B1-tcpip-%EC%86%8C%EC%BC%93-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-with-%EC%9C%88%EB%8F%84/](https://ehpub.co.kr/5-wsaeventselect%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EB%A9%80%ED%8B%B0%ED%94%8C%EB%A0%89%EC%8B%B1-tcpip-%EC%86%8C%EC%BC%93-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-with-%EC%9C%88%EB%8F%84/)
+
+[멀티플렉싱 fd_set 활용법 관련] - [https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=tipsware&logNo=220810795410](https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=tipsware&logNo=220810795410), [https://ghfkdgml.tistory.com/14](https://ghfkdgml.tistory.com/14)
+
+[멀티플렉싱 관련 tutorial] - [https://www.binarytides.com/code-tcp-socket-server-winsock/](https://www.binarytides.com/code-tcp-socket-server-winsock/)
+
+
