@@ -312,4 +312,33 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const
 * <em>readfds</em> - readable 상태가 될 수 있는 소켓 배열을 감시하는 포인터, 만약 readfds fd_set에 있는 소켓 중 하나가 데이터를 수신하면 해당 소켓은 readable 상태가 된다.
 * <em>writefds</em> - 마찬가지로 writable 상태가 될 수 있는 소켓 배열 감시
 * <em>exceptfds</em> - read,write 이외의 상태를 처리하는 소켓 배열 감시
-* <em>timeout</em> - select 함수가 얼마나 기다려야 하는지 정해주는 변수  
+* <em>timeout</em> - select 함수가 얼마나 기다려야 하는지 정해주는 변수 
+
+#### 2.3.3.3 read 작업을 처리할 fd_set 선언 민 초기화
+```C
+SOCKET s; // client 소켓 처리하기 위한 소켓
+fd_set readfds; // Set of socket descriptors
+SOCKET client_socket[30]; // number of clients
+
+// initializing client_socket[30]
+for (int i = 0; i < 30; i++) {
+	client_socket[i] = 0;
+}
+```
+
+#### 2.3.3.4 클라이언트의 요청을 accept 하고 해당 소켓을 readfds fd_set으로 관리한다
+```C
+        // clear the fd_set
+        FD_ZERO(&readfds); 
+
+        // add server socket to fd set
+        FD_SET(serverSocket, &readfds);
+
+        // add child sockets to fd set
+        for (int i = 0; i < max_clients; i++) {
+		s = client_socket[i];
+		if (s > 0) {
+		        FD_SET(s, &readfds);
+		}
+        }
+```
