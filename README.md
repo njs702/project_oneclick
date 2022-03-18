@@ -658,10 +658,16 @@ void recv_thread(void* pData) {
 ### 3.1.3 구현 프로그램 테스트하기
 네트워크 통신 특성 상, 어느 한 단계라도 이루어지지 않는다면 다음 단계로 나아가지 못한다. 프로그램을 작성하고 해당 기능에 대한 단위 테스트를 진행할 때 많은 어려움이 있었다. 서버의 경우 교육장 데스크탑은 공유기를 사용하기 때문에 변환된 내부 IP를 사용하게 된다(ex)192.168.0.4, iptime 공유기 환경). 따라서 해당 데스크탑으로 서버를 켤 경우 bind 에러 및 클라이언트의 접속을 받아내지 못하는 경우가 생겨 진행을 하는데 많은 어려움이 있었다. 공유기 환경 데스크탑이 아닌, 노트북이나 개인 데스크탑에서 서버를 실행시켜 해결했다. 이 외에도 메시지를 주고받는 통신 부분에서 테스트하는 부분에 어려움이 있었다. 수 많은 디버깅을 통해 작성해 나갈 수 있었다.
 
-### 3.1.4 팀원끼리 서로의 코드 이해시키기
+## 3.2 결론
+### 3.2.1 활용방안
+TCP/IP 소켓 통신은 폴링을 자동화하기 쉽고 데이터 손실을 막을 수 있으므로 신뢰성이 높다. 또한, 근거리 통신망이나 인트라넷, 인터넷에 연결된 컴퓨터에서 정보를 교환할 수 있다. 따라서 멀티 유저 게임, 로봇제작 및 통신을 할 수 있다. 
+
+### 3.2.2 부족했던 점 & 아쉬운 점
 모든 팀 협업이 마찬가지겠지만, 서로가 작성한 코드는 서로가 이해하는 데 있어서 많은 시간이 필요하다. 시간적 특성(기간 7일) 때문에 서로가 코드를 리뷰하는 시간을 갖지 못해서 더 많은 어려움이 있었다. 그리고 프로젝트 관련 개념 역시 쉬운 내용이 아니었기 때문에 서로가 개인적으로 공부를 했어야 했고, 그렇기 때문에 더더욱 시간이 부족했던 것 같다. 이번 경험을 통해 팀원끼리 소통하는 시간을 늘려 효율적인 협업이 될 수 있도록 해야겠다고 생각했다. github를 통해 버전 관리를 해 나가며 나름대로 코드의 흐름을 이해할 수 있게 작성했다.
 
-## 3.2 부족했던 점 & 아쉬운 점
+
+
+
 
 # 4. References
 [소켓 통신 관련] - [https://yumdevelop.blogspot.com/2018/04/network-server-client-socket.html](https://yumdevelop.blogspot.com/2018/04/network-server-client-socket.html)
@@ -671,6 +677,9 @@ void recv_thread(void* pData) {
 [Winsock 활용 및 정보 관련] - [https://ehpub.co.kr/tag/wsadata-%ED%98%95%EC%8B%9D/](https://ehpub.co.kr/tag/wsadata-%ED%98%95%EC%8B%9D/)
 
 [소켓 멀티플렉싱 통신 관련] - [https://ehpub.co.kr/5-wsaeventselect%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EB%A9%80%ED%8B%B0%ED%94%8C%EB%A0%89%EC%8B%B1-tcpip-%EC%86%8C%EC%BC%93-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-with-%EC%9C%88%EB%8F%84/](https://ehpub.co.kr/5-wsaeventselect%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EB%A9%80%ED%8B%B0%ED%94%8C%EB%A0%89%EC%8B%B1-tcpip-%EC%86%8C%EC%BC%93-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-with-%EC%9C%88%EB%8F%84/)
+
+[스레드, 스레드 데이터] [https://ko.wikipedia.org/wiki/%EC%8A%A4%EB%A0%88%EB%93%9C_(%EC%BB%B4%ED%93%A8%ED%8C%85)]
+[https://m.blog.naver.com/three_letter/220333796848]
 
 [멀티플렉싱 fd_set 활용법 관련] - [https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=tipsware&logNo=220810795410](https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=tipsware&logNo=220810795410), [https://ghfkdgml.tistory.com/14](https://ghfkdgml.tistory.com/14)
 
