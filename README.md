@@ -36,7 +36,10 @@
 소켓은 기본적으로 Connection 기반의 양방향 통신이다. 서버와 클라이언트 모두 Socket이 필요하며, 해당 Socket이 연결되어 있는 상태에서 통신이 가능하다. 따라서 서버가 클라이언트로 메시지를 보내고 받을 수 있지만, 클라이언트 역시 서버로 메시지를 보내고 받을 수 있다. 이 Connection이 계속해서 유지되기 때문에 스트리밍이나 실시간 채팅 등 실시간 데이터 교환에서 이점이 있다. 하지만 계속해서 Connection을 유지해야 하는 부분에서 많은 리소스가 소모된다는 단점이 있다.  
 
 # 2. 프로젝트 구현
-## 2.1 SERVER-CLIENT : Basic Socket Communication
+## 2.1 개발 환경
+* Visual Studio 2022
+* Operating System - Windows 10
+## 2.2 SERVER-CLIENT : Basic Socket Communication
 </br>
 <p align ="center"><img src="./img/socket-basic.gif"></p>
 
@@ -45,3 +48,35 @@
 * <em>listen()</em> - 서버에서 클라이언트의 요청이 오는지 확인하는 함수
 * <em>accpet()</em> - 클라이언트에서 connect 연결 요청이 왔을 때, 해당 연결을 허용하는 함수
 * <em>recv()/send()</em> - 서버 및 클라이언트 소켓에서 데이터를 송/수신하는 함수
+* <em>closesocket()</em> - 생성된 소켓 소멸하는 함수
+
+## 2.2.1 Implementation
+```C
+#pragma comment(lib,"ws2_32.lib")  // winsock2를 사용하기 위한 lib를 추가합니다.
+#include <Winsock2.h>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#define SERVER_IP "127.0.0.1"
+#define SERVER_PORT 9090
+```
+1. 윈도우 환경에서 소켓을 사용하기 위한 외부 라이브러리 추가
+2. Visual studio에서 소켓을 사용하기 위한 Winsock2.h 헤더파일 추가
+3. 사용할 IP 및 포트 설정(프로젝트에서는 로컬 IP 주소를 사용했음)  
+
+```C
+WSADATA wsaData;
+
+// 1. Winsock 초기화, WINSOCK VERSION 2.2
+if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+	printf("WSAStartup failed: %d\n", WSAStartup(MAKEWORD(2, 2), &wsaData));
+	return 1;
+}
+else {
+	Sleep(2000);
+	printf("WSAStartup completed!!\n");
+}
+
+```
+1. 해당 부분은 Winsock을 초기화하는 부분이다.
+2. WSAStartup은 Winsock의 속성 정보를 자동으로 설정해준다.
+3. 실제로 소켓 프로그래밍을 할 때 사용할 일은 없지만, 하위 버전과의 호환성을 맞추어준다는 부분에서 꼭 설정해야 한다.
