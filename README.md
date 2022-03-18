@@ -170,3 +170,83 @@ SOCKET clientSocket;
 ```
 1. 사용했던 서버 및 받아온 클라이언트 소켓 종료 및 초기화
 2. 사용한 Winsock 초기화
+
+### 2.2.2 Implementation - CLIENT
+#### 2.2.2.1 Headers & 전처리
+```C
+#pragma comment(lib,"ws2_32.lib")  // winsock2를 사용하기 위한 lib를 추가합니다.
+#include <stdio.h>
+#include <stdlib.h>
+#include <WinSock2.h>
+#include <process.h>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#define DEFAULT_PORT "27015"
+#define MY_LOCAL_IP "127.0.0.1"
+```
+1. 윈도우 환경에서 소켓을 사용하기 위한 외부 라이브러리 추가
+2. Visual studio에서 소켓을 사용하기 위한 Winsock2.h 헤더파일 추가
+3. 사용할 IP및 포트 설정(프로젝트에서는 로컬 IP주소를 사용했음)
+
+#### 2.2.2.2 Winsock 초기화
+```C
+        // initializing Winsock
+        printf("Initializing Winsock...\n");
+        // 1. Winsock 초기화, WINSOCK VERSION 2.2
+        if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+                printf("WSAStartup failed: %d\n", WSAStartup(MAKEWORD(2, 2), &wsaData));
+                return 1;
+        }
+        else {
+                Sleep(2000);
+                printf("WSAStartup completed!!\n");
+        }
+```
+1. Winsock을 초기화하는 부분이다.
+2. WSAStartup은 Winsock의 속성 정보를 자동으로 설정해준다.
+3. 실제로 소켓 프로그래밍을 할 때 사용할 일은 없지만, 하위 버전과의 호환성을 맞추어준다는 부분에서 꼭 설정해야 한다.
+
+#### 2.2.2.3 Socket 생성
+```C
+    // 2. Creating socket
+    // 2. 초기화 후 서버에서 사용할 SOCKET 인스턴스 생성
+    // socket() function is used to create a socket
+    if ((clientSocket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+        printf("Could not create socket : %d\n", WSAGetLastError());
+    }
+    else {
+        Sleep(2000);
+        printf("Socket has been created!\n");
+        // Address Family : AF_INET ( = IPv4)
+        // Type : SOCK_STREAM( = TCP Protocol connection)
+        // Protocol : 0
+    }
+    server.sin_addr.s_addr = inet_addr(MY_LOCAL_IP); // 서버 IP
+    server.sin_family = AF_INET; // IPv4
+    server.sin_port = htons(9090); // 사용할 포트 번호 지정
+```
+1. socket() 함수를 통해 소켓 인스턴스를 만들어 준다.
+2. sockaddr_in 구조체 server에 클라이언트가 사용할 통신방법, IP, 포트 번호를 할당해 놓는다.
+3. INADDR_ANY를 통해 자동으로 컴퓨터에 존재하는 랜카드 ip주소를 할당해 줄 수있다. 이 방법을 사용하는 것이 호환성 부분에서 좀 더 유연하기 때문에 사용하는 것이 좋다.
+
+#### 2.2.2.4 서버에 연결(connect) 요청
+```C
+    // 3. Connect to server
+    if (connect(clientSocket, (struct sockaddr*)&server, sizeof(server)) < 0) {
+        printf("Connect error!\n");
+        return 1;
+    }
+    else {
+        printf("Connection has been completed!\n");
+    }
+```
+1. sockaddr_in 구조체 server에 저장해 놓았던 연결을 요청할 서버의 통신방법, IP주소, 포트 번호를 통해 서버에 연결을 요청할 수 있다.
+2. connect()함수를 사용해 서버에 연결을 요청한다.
+
+#### 2.2.2.5 클라이언트 종료 및 초기화
+```C
+    closesocket(clientSocket);
+    WSACleanup();
+```
+1. 사용했던 클라이언트 소켓 종료 및 초기화
+2. 사용한 Winsock 초기화
