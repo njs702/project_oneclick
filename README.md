@@ -256,4 +256,6 @@ SOCKET clientSocket;
 <p align ="center"><img src="./img/socket_client_multiplex.png"></p>
   
 * Basic 통신 프로그램은 서버 클라이언트 1:1 통신 방식이다.
-* 클라이언트가 많아지면 1:N 통신 
+* 클라이언트가 많아지면 1:N 통신 방식을 진행해야 한다.
+* 특정 소켓의 I/O operation이 이루어질 때 해당 연산을 선택해가며 처리한다
+* 많은 연산, 많은 메모리 공간 요구, IPC 방법이 복잡하다는 단점이 있다.
