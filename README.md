@@ -316,14 +316,14 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const
 
 #### 2.3.3.3 read 작업을 처리할 fd_set 선언 민 초기화
 ```C
-SOCKET s; // client 소켓 처리하기 위한 소켓
-fd_set readfds; // Set of socket descriptors
-SOCKET client_socket[30]; // number of clients
+        SOCKET s; // client 소켓 처리하기 위한 소켓
+        fd_set readfds; // Set of socket descriptors
+        SOCKET client_socket[30]; // number of clients
 
-// initializing client_socket[30]
-for (int i = 0; i < 30; i++) {
-	client_socket[i] = 0;
-}
+        // initializing client_socket[30]
+        for (int i = 0; i < 30; i++) {
+	        client_socket[i] = 0;
+        }
 ```
 
 #### 2.3.3.4 클라이언트의 요청을 accept 하고 해당 소켓을 readfds fd_set으로 관리한다
@@ -342,3 +342,32 @@ for (int i = 0; i < 30; i++) {
 		}
         }
 ```
+
+#### 2.3.3.5 select 함수를 사용해 어떠한 행동을 해야할지 정한다
+```C
+        // wait for an activity on any of the sockets, timeout = NULL -> 무한대로 기다림
+	activity = select(0, &readfds, NULL, NULL, NULL);
+        
+        if (activity == SOCKET_ERROR) {
+		perror("accept error");
+		exit(EXIT_FAILURE);
+	}
+```
+1. 설정한 fd_set readfds에서 무슨 일이 일어나는지 모니터링 한다
+2. 어떠한 액션이 일어나게 되면 activity 변수에 저장된다.
+
+#### 2.3.3.6 FD_ISSET을 통해 서버의 connection 관련 행동을 accept함수로 처리
+```C
+// 만약 server socket에서 무슨 일이 일어난다 -> 연결 요청이 들어오는 것
+	if (FD_ISSET(serverSocket, &readfds)) {
+		if ((newSocket = accept(serverSocket, (struct sockaddr*)&address, (int*)&addrlen)) < 0) {
+			perror("accept");
+			exit(EXIT_FAILURE);
+		}
+        }
+```
+1. FD_ISSET은 fd_set에서 특정 소켓에 무슨 일이 일어나는지 체크하는 함수
+2. 만약 무슨 일이 일어났다면, serverSocket의 경우 클라이언트의 연결 요청을 처리하는 일
+3. 클라이언트의 connect 요청을 accept로 처리해 준다.
+
+
