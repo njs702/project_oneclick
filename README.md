@@ -50,7 +50,9 @@
 * <em>recv()/send()</em> - 서버 및 클라이언트 소켓에서 데이터를 송/수신하는 함수
 * <em>closesocket()</em> - 생성된 소켓 소멸하는 함수
 
-## 2.2.1 Implementation
+### 2.2.1 Implementation - SERVER  
+
+#### 2.2.1.1 Headers & 전처리
 ```C
 #pragma comment(lib,"ws2_32.lib")  // winsock2를 사용하기 위한 lib를 추가합니다.
 #include <Winsock2.h>
@@ -63,6 +65,7 @@
 2. Visual studio에서 소켓을 사용하기 위한 Winsock2.h 헤더파일 추가
 3. 사용할 IP 및 포트 설정(프로젝트에서는 로컬 IP 주소를 사용했음)  
 
+#### 2.2.1.2 Winsock 초기화
 ```C
 WSADATA wsaData;
 
@@ -77,6 +80,64 @@ else {
 }
 
 ```
-1. 해당 부분은 Winsock을 초기화하는 부분이다.
+1. Winsock을 초기화하는 부분이다.
 2. WSAStartup은 Winsock의 속성 정보를 자동으로 설정해준다.
 3. 실제로 소켓 프로그래밍을 할 때 사용할 일은 없지만, 하위 버전과의 호환성을 맞추어준다는 부분에서 꼭 설정해야 한다.
+
+#### 2.2.1.3 Socket 생성
+```C
+SOCKET serverSocket; // 소켓 인스턴스
+struct sockaddr_in server; // 프로토콜, IP, 포트 설정을 위한 구조체
+
+        // 2. 초기화 후 서버에서 사용할 SOCKET 인스턴스 생성
+	// socket() function is used to create a socket
+	if ((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+		printf("Could not create socket : %d\n", WSAGetLastError());
+		exit(EXIT_FAILURE);
+	}
+	else {
+		Sleep(2000);
+		printf("Socket has been created!\n");
+		// Address Family : AF_INET ( = IPv4)
+		// Type : SOCK_STREAM( = TCP Protocol connection)
+		// Protocol : 0
+	}
+        //server.sin_addr.s_addr = INADDR_ANY; // 자동으로 이 컴퓨터에 존재하는 랜카드 중 사용가능한 랜카드의 IP주소 사용
+	server.sin_addr.s_addr = inet_addr("127.0.0.1");
+	server.sin_family = AF_INET; // IPv4
+	server.sin_port = htons(9090); // 사용할 포트 번호 지정
+```
+1. socket() 함수를 통해 소켓 인스턴스를 만들어 준다.
+2. sockaddr_in 구조체 server에 서버가 사용할 통신방법, IP, 포트 번호를 할당해 놓는다.
+3. INADDR_ANY를 통해 자동으로 컴퓨터에 존재하는 랜카드 ip주소를 할당해 줄 수있다. 이 방법을 사용하는 것이 호환성 부분에서 좀 더 유연하기 때문에 사용하는 것이 좋다.
+
+#### 2.2.1.4 컴퓨터 네트워크에 Bind
+```C
+// 3. Socket 생성 후 Bind
+	if (bind(serverSocket, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR) {
+		printf("Bind failed with error code : %d\n", WSAGetLastError());
+		exit(EXIT_FAILURE);
+	}
+	else {
+		Sleep(2000);
+		printf("Bind done!\n");
+	}
+```
+1. bind() 함수를 통해 소켓이 사용할 네트워크 정보를 바인딩 해준다.
+2. 이전 단계에서 생성했던 sockaddr_in 구조체 server에 할당했던 통신방법, ip정보, 포트 넘버가 소켓 및 네트워크에 할당되는 단계이다.
+
+#### 2.2.1.5 Socket에서 listen을 통해 클라이언트의 연결 요청을 대기
+```C
+        // 4. Socket에서 Listen을 통해 수신 대기
+	if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR) {
+		printf("Listen failed with error: %ld\n", WSAGetLastError());
+		closesocket(serverSocket);
+		WSACleanup();
+		return 1;
+	}
+	else {
+		Sleep(2000);
+		printf("Waiting for incoming connections...\n");
+	}
+```
+1. listen()함수를 통해 클라이언트의 연결 요청을 감지한다
