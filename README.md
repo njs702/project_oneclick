@@ -250,3 +250,10 @@ SOCKET clientSocket;
 ```
 1. 사용했던 클라이언트 소켓 종료 및 초기화
 2. 사용한 Winsock 초기화
+
+## 2.3 SERVER-CLIENT : send/recv communicatuion with Multiplexing
+### 2.3.1 What is Multiplexing?
+![multiplexing](./img/socket_client_multiplex.png)
+  
+* Basic 통신 프로그램은 서버 클라이언트 1:1 통신 방식이다.
+* 클라이언트가 많아지면 1:N 통신 
