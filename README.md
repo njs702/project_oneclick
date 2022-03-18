@@ -358,7 +358,7 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const
 
 #### 2.3.3.6 FD_ISSET을 통해 서버의 connection 관련 행동을 accept함수로 처리
 ```C
-// 만약 server socket에서 무슨 일이 일어난다 -> 연결 요청이 들어오는 것
+        // 만약 server socket에서 무슨 일이 일어난다 -> 연결 요청이 들어오는 것
 	if (FD_ISSET(serverSocket, &readfds)) {
 		if ((newSocket = accept(serverSocket, (struct sockaddr*)&address, (int*)&addrlen)) < 0) {
 			perror("accept");
@@ -370,4 +370,49 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const
 2. 만약 무슨 일이 일어났다면, serverSocket의 경우 클라이언트의 연결 요청을 처리하는 일
 3. 클라이언트의 connect 요청을 accept로 처리해 준다.
 
+#### 2.3.3.7 연결된 클라이언트들을 client_socket[30]에 넣어 관리한다.
+```C
+        // 만약 server socket에서 무슨 일이 일어난다 -> 연결 요청이 들어오는 것
+	if (FD_ISSET(serverSocket, &readfds)) {
+		if ((newSocket = accept(serverSocket, (struct sockaddr*)&address, (int*)&addrlen)) < 0) {
+			perror("accept");
+			exit(EXIT_FAILURE);
+		}
+        // add new socket to array of sockets
+		for (int i = 0; i < max_clients; i++) {
+			if (client_socket[i] == 0) {
+				client_socket[i] = newSocket;
+				printf("Adding to list of sockets at index %d\n", i);
+				break;
+			}
+		}
+        }
+```
+1. 각각의 클라이언트 요청들을 처리
+2. 만약 해당 배열이 비어있으면, 그곳으로 클라이언트를 넣어 관리해준다.
+
+#### 2.3.3.8 serverSocket이 아니라, 다른 소켓에 의한 I/O operation 요청일 경우
+```C
+        for(int i = 0; i < max_clients; i++){
+                s = client_socket[i]; // 모든 소켓을 돌면서 처리
+                
+                // 만약 해당 클라이언트가 어떠한 행동을 한다면(여기서는 read)
+                if(FD_ISSET(s,&readfds)){
+                        // get details of the client
+                        getpeername(s, (struct sockaddr* )&address, (int*)&addrlen);
+                        /* =================================================
+                         * send(), recv() 작업 처리하기(client의 요청에 맞게)
+                         * ================================================= */
+                }
+        }
+```
+
+#### 2.3.3.9 서버 종료 및 초기화
+```C
+closesocket(newSocket);
+closesocket(serverSocket);
+WSACleanup();
+```
+1. 사용했던 서버 및 받아온 클라이언트 소켓 종료 및 초기화
+2. 사용한 Winsock 초기화
 
