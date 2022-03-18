@@ -281,3 +281,35 @@ SOCKET clientSocket;
 * 클라이언트가 많아지면 1:N 통신 방식을 진행해야 한다.
 * 특정 소켓의 I/O operation이 이루어질 때 해당 연산을 선택해가며 처리한다
 * 많은 연산, 많은 메모리 공간 요구, IPC 방법이 복잡하다는 단점이 있다.
+
+### 2.3.2 프로그램 설계
+<p align ="center"><img src="./img/client_connect_multiplex.png"></p>  
+
+* 클라이언트에서 서버로 연결 요청
+* 서버에서 관리하는 클라이언트 소켓 배열에 넣고 이벤트 관리
+
+<p align = "center"><img src="./img/client_server_send_recv_multiplex.png"></p>
+
+* 특정 소켓에서 메시지 send 이벤트를 발생시킨 경우
+* 신호 상태의 이벤트에 발생한 네트워크 이벤트 종류 확인
+* 발생한 네트워크 이벤트에 맞게 처리
+
+### 2.3.3 Implementation - SERVER
+> #### SERVER Multiplexing의 Listen()까지는 이전의 코드와 같다.
+
+#### 2.3.3.1 작동 원리
+> 1. 다수의 소켓을 모니터링하며 그곳에서 '무언가가' 일어나는지 계속 모니터링한다.  
+
+> 2. 다수의 소켓 중 하나의 소켓이 send() 액션을 취한다면, 서버는 해당 액션을 notify하고 해당 과정을 처리한다.
+
+> 3. Winsock api는 다수의 소켓을 모니터링하며 액션을 처리할 수 있게 하는 select()함수를 제공한다.
+
+#### 2.3.3.2 Event-driven socket programming & 비동기 소켓 프로그래밍
+```C
+int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timeval *timeout);
+```
+* <em>nfd</em> - dummy data
+* <em>readfds</em> - readable 상태가 될 수 있는 소켓 배열을 감시하는 포인터, 만약 readfds fd_set에 있는 소켓 중 하나가 데이터를 수신하면 해당 소켓은 readable 상태가 된다.
+* <em>writefds</em> - 마찬가지로 writable 상태가 될 수 있는 소켓 배열 감시
+* <em>exceptfds</em> - read,write 이외의 상태를 처리하는 소켓 배열 감시
+* <em>timeout</em> - select 함수가 얼마나 기다려야 하는지 정해주는 변수  
