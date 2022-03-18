@@ -342,7 +342,8 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const
 		}
         }
 ```
-
+1. 서버소켓을 fd_set에 넣는 이유 : 클라이언트들의 연결 요청을 처리하기 위함
+2. 만약 클라이언트가 접속해 있다면, 해당 클라이언트의 요청을 처리하기 위해 fd_set에 추가함
 #### 2.3.3.5 select 함수를 사용해 어떠한 행동을 해야할지 정한다
 ```C
         // wait for an activity on any of the sockets, timeout = NULL -> 무한대로 기다림
@@ -415,4 +416,38 @@ WSACleanup();
 ```
 1. 사용했던 서버 및 받아온 클라이언트 소켓 종료 및 초기화
 2. 사용한 Winsock 초기화
+
+### 2.3.4 Implementation - CLIENT
+> #### CLIENT Multiplexing의 작동 원리는 이전 코드와 같다.
+> 하지만 message data를 서버에게 send하고 서버의 응답을 recv 하는 부분이 추가되었다.
+#### 2.3.4.1 서버에게 나의 message data를 send하기
+```C
+        // send data
+        message = "message to server from client!";
+        if (send(clientSocket, message, strlen(message), 0) < 0) {
+            printf("Send failed!\n");
+            return 1;
+        }
+        else {
+            printf("Message send : %s\n", message);
+        }
+```
+1. send() 함수를 사용해 연결되어있는 서버에게 메시지를 보낼 수 있다.
+2. 현재 clientSocket을 통해 서버와 연결되어 있고, 해당 소켓을 통해 message를 send한다.
+
+#### 2.3.4.2 서버로부터 message data를 receive 하기
+```C
+        // 5. Receive reply from server
+        if ((recv_size = recv(clientSocket, server_reply, 2000, 0)) == SOCKET_ERROR) {
+            printf("Receive failed!\n");
+        }
+        else {
+            printf("Message received : ");
+            server_reply[recv_size] = '\0';
+            puts(server_reply);
+        }
+```
+1. recv 함수는 send함수와 이름만 다를 뿐, 사용 방법은 같다.
+2. 마찬가지로 서버와 연결되어 있는 clientSocket을 통해 서버의 메시지를 받는다.
+3. recv 함수는 메시지를 받은 경우 해당 메시지의 길이를 return한다(recv_size).
 
