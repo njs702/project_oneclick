@@ -451,3 +451,22 @@ WSACleanup();
 2. 마찬가지로 서버와 연결되어 있는 clientSocket을 통해 서버의 메시지를 받는다.
 3. recv 함수는 메시지를 받은 경우 해당 메시지의 길이를 return한다(recv_size).
 
+## 2.4 SERVER-CLIENT : send/recv communicatuion with Multi-Thread
+### 2.4.1 What is Multi-thread?
+<p align = "center"><img src = "./img/multi_thread.png"></p>  
+
+멀티 쓰레드란, CPU의 최대 활용을 위해 프로그램의 쓰레드를 둘 이상 실행시키는 것이다. Context switching 속도가 굉장히 빠르기 때문에 사용자 입장에서는 동시에 작업이 수행되는 것 처럼 보인다.
+
+### 2.4.2 Multi-thread의 흐름 과정
+<p align = "center"><img src = "./img/multi_thread_flow.gif"></p>  
+<p align = "center">멀티쓰레드에서 작업이 수행되는 과정</p>
+
+### 2.4.3 프로그램 설계
+<p align = "center"><img src = "./img/server_thread.png"></p>
+
+* main_thread는 서버 초기화 및 연결 , 소켓의 종료를 수행한다
+* 만약 클라이언트로부터 작업 요청이 온다면, 해당 작업은 쓰레드를 새로 생성해 생성된 쓰레드가 수행한다.
+* send 작업은 main_thread가 담당한다, recv 작업을 쓰레드로 나누어서 처리하는 이유는 서버는 하나지만 client는 다수가 존재한다.
+* 다수의 클라이언트에서 들어오는 요청을 recv로 처리할 때 쓰레드를 통해 해결한다.
+
+### 2.4.4 Implementation - SERVER
