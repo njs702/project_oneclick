@@ -126,7 +126,7 @@ struct sockaddr_in server; // 프로토콜, IP, 포트 설정을 위한 구조�
 1. bind() 함수를 통해 소켓이 사용할 네트워크 정보를 바인딩 해준다.
 2. 이전 단계에서 생성했던 sockaddr_in 구조체 server에 할당했던 통신방법, ip정보, 포트 넘버가 소켓 및 네트워크에 할당되는 단계이다.
 
-#### 2.2.1.5 Socket에서 listen을 통해 클라이언트의 연결 요청을 대기
+#### 2.2.1.5 서버에서 listen을 통해 클라이언트의 연결 요청을 대기
 ```C
         // 4. Socket에서 Listen을 통해 수신 대기
 	if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR) {
@@ -141,3 +141,32 @@ struct sockaddr_in server; // 프로토콜, IP, 포트 설정을 위한 구조�
 	}
 ```
 1. listen()함수를 통해 클라이언트의 연결 요청을 감지한다
+
+#### 2.2.1.6 서버에서 클라이언트의 요청을 accept
+```C
+SOCKET clientSocket;
+
+        // 5. Client의 연결 요청을 수락하기
+	clientSocket = INVALID_SOCKET;
+	clientSocket = accept(serverSocket, NULL, NULL);
+	if (clientSocket == INVALID_SOCKET) {
+		printf("accept failed: %d\n", WSAGetLastError());
+		closesocket(serverSocket);
+		WSACleanup();
+		return 1;
+	}
+	else {
+		printf("Connection accepted!\n");
+	}
+```
+1. 서버의 소켓을 통해 accept 된 클라이언트의 정보를 clientSocket에 넣는다
+2. 해당 클라이언트에서 전송한 정보들이 clientSocket에 저장되는 형식
+
+#### 2.2.1.7 서버 종료 및 Winsock 초기화
+```C
+        closesocket(clientSocket);
+	closesocket(serverSocket);
+	WSACleanup();
+```
+1. 사용했던 서버 및 받아온 클라이언트 소켓 종료 및 초기화
+2. 사용한 Winsock 초기화
